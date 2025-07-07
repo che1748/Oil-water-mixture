@@ -1,0 +1,55 @@
+# 1.Initialization
+units lj
+dimension 3
+atom_style atomic
+boundary p p p
+
+# 2.System definition
+region simbox block -20 20 -20 20 -20 20
+create_box 2 simbox
+region  top     block -20 20 -20 20 10 17
+region bottom  block -20 20 -20 20 -17 -10
+create_atoms 1 random 500 37458 bottom overlap 0.3
+create_atoms 2 random 500 43827 top overlap 0.3
+
+# 3.Setting
+group oil type 1
+group water type 2
+mass 1 2.0  # oil
+mass 2 3.0  # water
+pair_style dpd 1.0 1.0 12345
+pair_coeff 1 1 25.0 1.0          # Water-water
+pair_coeff 2 2 25.0 1.0           # Oil-oil
+pair_coeff 1 2 100.0 1.0           # Water-oil (immiscible)
+fix grav_oil oil addforce 0.0 0.0 1
+fix grav_water water addforce 0.0 0.0 -1
+
+# 4. visualization
+thermo 10
+thermo_style custom step etotal press
+
+# 5.Run
+comm_modify vel yes  # Enable velocity communication for ghost atoms
+minimize 1.0e-5 1.0e-6 1000 10000 
+
+# PART B - MOLECULAR DYNAMICS
+# 4) Visualization
+thermo 50
+thermo_style custom step temp etotal pe ke press
+
+# 5) Run
+fix mynve all nve
+fix mylgv all langevin 2.0 2.0 0.1 10917
+timestep 0.005
+
+
+dump		1 all atom 500 dump.mixture
+dump		2 all image 500 image.*.jpg type type &
+		zoom 1.6 adiam 1.5
+dump_modify	2 pad 5
+
+dump		3 all movie 500 movie.mpg type type &
+		zoom 1.6 adiam 1.5
+dump_modify	3 pad 5
+
+run 50000
