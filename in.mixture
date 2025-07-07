@@ -9,20 +9,20 @@ region simbox block -20 20 -20 20 -20 20
 create_box 2 simbox
 region  top     block -20 20 -20 20 10 17
 region bottom  block -20 20 -20 20 -17 -10
-create_atoms 1 random 500 37458 bottom overlap 0.3
-create_atoms 2 random 500 43827 top overlap 0.3
+create_atoms 1 random 3000 37458 simbox overlap 0.3
+create_atoms 2 random 3000 43827 simbox overlap 0.3
 
 # 3.Setting
 group oil type 1
 group water type 2
 mass 1 2.0  # oil
 mass 2 3.0  # water
-pair_style dpd 1.0 1.0 12345
-pair_coeff 1 1 25.0 1.0          # Water-water
-pair_coeff 2 2 25.0 1.0           # Oil-oil
-pair_coeff 1 2 100.0 1.0           # Water-oil (immiscible)
-fix grav_oil oil addforce 0.0 0.0 1
-fix grav_water water addforce 0.0 0.0 -1
+pair_style lj/cut 2.5 
+pair_coeff 1 1 10.0 1.0          # Water-water
+pair_coeff 2 2 10.0 1.0           # Oil-oil
+pair_coeff 1 2 1 1.0           # Water-oil (immiscible)
+# fix grav_oil oil addforce 0.0 0.0 -1
+# fix grav_water water addforce 0.0 0.0 -10
 
 # 4. visualization
 thermo 10
